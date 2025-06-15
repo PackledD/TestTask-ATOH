@@ -1,0 +1,21 @@
+networks:
+    users-net:
+
+services:
+  users-db:
+    image: postgres:15.4
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=users
+    ports:
+      - "5555:5432"
+    networks:
+      - users-net
+    volumes:
+      - users-data:/var/lib/postgresql/data
+
+volumes:
+  users-data:
+
