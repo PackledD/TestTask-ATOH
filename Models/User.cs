@@ -22,5 +22,20 @@ namespace Models
         public string? ModifiedBy { get; set; } = null;
         public DateTime? RevokedOn { get; set; } = null;
         public string? RevokedBy { get; set; } = null;
+
+        public int Age()
+        {
+            if (Birthday is null)
+            {
+                return -1;
+            }
+            var now = DateTime.Now;
+            var age = now.Year - Birthday.Value.Year;
+            if (Birthday > now.AddYears(-age))
+            {
+                age--;
+            }
+            return age;
+        }
     }
 }
