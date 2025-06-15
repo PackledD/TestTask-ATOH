@@ -76,7 +76,7 @@ namespace WebApiService.Controllers
         }
 
         [HttpGet("{login}")]
-        public async Task<ActionResult<ICollection<User>>> GetUserByLogin([FromRoute] string login)
+        public async Task<ActionResult<User>> GetUserByLogin([FromRoute] string login)
         {
             var res = await _service.GetUserAsync(login);
             if (res is null)
@@ -87,7 +87,7 @@ namespace WebApiService.Controllers
         }
 
         [HttpPost("{login}/auth")]
-        public async Task<ActionResult<ICollection<User>>> AuthUser([FromRoute] string login, [FromBody] string password)
+        public async Task<ActionResult<User>> AuthUser([FromRoute] string login, [FromBody] string password)
         {
             var res = await _service.GetUserWithPasswordAsync(login, password);
             if (res is null)
