@@ -13,6 +13,7 @@ namespace DataAccess
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<User>().HasAlternateKey(u => u.Login);
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
