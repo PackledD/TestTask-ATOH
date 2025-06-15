@@ -143,7 +143,7 @@ namespace WebApiService.Services
         public async Task<User?> GetUserWithPasswordAsync(string login, string password)
         {
             var user = await _GetUserAsync(login);
-            return user?.Password == password ? user : null;
+            return user?.Password == password && !user.RevokedOn.HasValue? user : null;
         }
 
         public async Task<ICollection<User>> GetElderUsersAsync(int age)
