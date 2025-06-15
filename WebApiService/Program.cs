@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using WebApiService.Services;
@@ -18,7 +19,12 @@ namespace WebApiService
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(opt =>
+            {
+                var basePath = AppContext.BaseDirectory;
+                var xmlPath = Path.Combine(basePath, "WebApiService.xml");
+                opt.IncludeXmlComments(xmlPath);
+            });
             builder.Services.AddAuthorization(opt =>
             {
                 opt.DefaultPolicy = new AuthorizationPolicyBuilder()

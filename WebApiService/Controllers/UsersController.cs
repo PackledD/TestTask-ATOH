@@ -28,6 +28,15 @@ namespace WebApiService.Controllers
             return User?.Identity?.Name ?? string.Empty;
         }
 
+        /// <summary>
+        /// Создание пользователя по логину, паролю, имени, полу и ДР, указание будет ли админом
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов
+        /// </remarks>
+        /// <param name="user">Добавляемый пользователь</param>
+        /// <response code="201">Пользователь создан</response>
+        /// <response code="400">Ошибка создания</response>
         [HttpPost]
         [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<User>> CreateUser([FromBody] UserCreateDto user)
@@ -41,6 +50,17 @@ namespace WebApiService.Controllers
             return Created();
         }
 
+        /// <summary>
+        /// Изменение имени, пола или ДР пользователя
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов, либо лично для пользователя, если он активен
+        /// </remarks>
+        /// <param name="id">Guid изменяемого пользователя</param>
+        /// <param name="user">Изменяемые поля пользователя</param>
+        /// <respones code="403">Доступ запрещен (не админ и не сам пользователь)</respones>
+        /// <response code="400">Ошибка обновления</response>
+        /// <response code="200">Обновлено успешно</response>
         [HttpPatch("{id}")]
         [Authorize]
         public async Task<ActionResult<User>> UpdateUser([FromRoute] Guid id, [FromBody] UserUpdateDto user)
@@ -58,6 +78,17 @@ namespace WebApiService.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Изменение пароля пользователя
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов, либо лично для пользователя, если он активен
+        /// </remarks>
+        /// <param name="id">Guid изменяемого пользователя</param>
+        /// <param name="newPwd">Новый пароль</param>
+        /// <respones code="403">Доступ запрещен (не админ и не сам пользователь)</respones>
+        /// <response code="400">Ошибка обновления</response>
+        /// <response code="200">Обновлено успешно</response>
         [HttpPatch("{id}/password")]
         [Authorize]
         public async Task<ActionResult<User>> ChangeUserPassword([FromRoute] Guid id, [FromBody] string newPwd)
@@ -75,6 +106,17 @@ namespace WebApiService.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Изменение логина пользователя
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов, либо лично для пользователя, если он активен
+        /// </remarks>
+        /// <param name="id">Guid изменяемого пользователя</param>
+        /// <param name="newLogin">Новый логин</param>
+        /// <respones code="403">Доступ запрещен (не админ и не сам пользователь)</respones>
+        /// <response code="400">Ошибка обновления</response>
+        /// <response code="200">Обновлено успешно</response>
         [HttpPatch("{id}/login")]
         [Authorize]
         public async Task<ActionResult<User>> ChangeUserLogin([FromRoute] Guid id, [FromBody] string newLogin)
@@ -92,6 +134,14 @@ namespace WebApiService.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Запрос списка всех активных пользователей, отсортированных по CreatedOn
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов
+        /// </remarks>
+        /// <returns>Отсортированнный список пользователей</returns>
+        /// <response code="200"></response>
         [HttpGet]
         [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<ICollection<User>>> GetActiveList()
@@ -99,6 +149,16 @@ namespace WebApiService.Controllers
             return Ok(await _service.GetActiveUsersAsync());
         }
 
+        /// <summary>
+        /// Запрос пользователя по логину
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов.
+        /// Возвращает имя, пол, ДР и статус (активный или нет) пользователя
+        /// </remarks>
+        /// <param name="login">Логин пользователя</param>
+        /// <respones code="404">Пользователь не существует</respones>
+        /// <response code="200">Пользователь найден</response>
         [HttpGet("{login}")]
         [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<User>> GetUserByLogin([FromRoute] string login)
@@ -111,6 +171,16 @@ namespace WebApiService.Controllers
             return Ok(new { res.Name, res.Gender, res.Birthday, isActive = !res.RevokedOn.HasValue });
         }
 
+        /// <summary>
+        /// Запрос пользователя по логину и паролю (авторизация)
+        /// </summary>
+        /// <remarks>
+        /// Доступно только лично для пользователя, если он активен
+        /// </remarks>
+        /// <param name="login">Логин</param>
+        /// <param name="password">Пароль</param>
+        /// <respones code="404">Пользователь не найден</respones>
+        /// <response code="200">Авторизация успешна</response>
         [HttpPost("{login}/auth")]
         public async Task<ActionResult<User>> AuthUser([FromRoute] string login, [FromBody] string password)
         {
@@ -124,6 +194,15 @@ namespace WebApiService.Controllers
             return Ok(res);
         }
 
+        /// <summary>
+        /// Запрос всех пользователей старше определенного возраста
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов
+        /// </remarks>
+        /// <param name="age">Искомый возраст</param>
+        /// <returns>Список пользователей старше заданного возраста</returns>
+        /// <response code="200"></response>
         [HttpGet("elder")]
         [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<ICollection<User>>> GetElderThan([FromQuery] int age)
@@ -131,6 +210,17 @@ namespace WebApiService.Controllers
             return Ok(await _service.GetElderUsersAsync(age));
         }
 
+        /// <summary>
+        /// Удаление пользователя по логину, полное или мягкое
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов.
+        /// При мягком удалении происходит только простановка RevokedOn и RevokedBy
+        /// </remarks>
+        /// <param name="login">Логин удаляемого пользователя</param>
+        /// <param name="isSoft">Тип удаления</param>
+        /// <respones code="404">Пользователь не существует</respones>
+        /// <response code="200">Пользователь удален</response>
         [HttpDelete("{login}")]
         [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<User>> DeleteUser([FromRoute] string login, [FromQuery] bool isSoft = true)
@@ -152,6 +242,16 @@ namespace WebApiService.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Восстановление пользователя
+        /// </summary>
+        /// <remarks>
+        /// Доступно только для админов.
+        /// Очистка полей RevokedOn и RevokedBy
+        /// </remarks>
+        /// <param name="login">Логин восстанавливаемого пользователя</param>
+        /// <respones code="404">Пользователь не существует</respones>
+        /// <response code="200">Пользователь удален</response>
         [HttpPost("{login}")]
         [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<User>> RestoreUser([FromRoute] string login)
