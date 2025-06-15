@@ -2,7 +2,6 @@
 
 namespace Models
 {
-    []
     public class User
     {
         [Key]
@@ -29,7 +28,7 @@ namespace Models
             {
                 return -1;
             }
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             var age = now.Year - Birthday.Value.Year;
             if (Birthday > now.AddYears(-age))
             {

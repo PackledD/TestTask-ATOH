@@ -24,20 +24,20 @@ namespace WebApiService.Services
         public async Task<bool> IsActive(Guid guid)
         {
             var user = await _GetUserAsync(guid);
-            return user != null && user.RevokedOn is null;
+            return user != null && !user.RevokedOn.HasValue;
         }
 
         public async Task<bool> IsActive(string login)
         {
             var user = await _GetUserAsync(login);
-            return user != null && user.RevokedOn is null;
+            return user != null && !user.RevokedOn.HasValue;
         }
 
         public async Task<User?> AddUserAsync(User newUser, string createBy)
         {
             try
             {
-                newUser.CreatedOn = DateTime.Now;
+                newUser.CreatedOn = DateTime.UtcNow;
                 newUser.CreatedBy = createBy;
                 await _ctx.Users.AddAsync(newUser);
                 await _ctx.SaveChangesAsync();
@@ -72,7 +72,7 @@ namespace WebApiService.Services
                 }
                 if (c > 0)
                 {
-                    user.ModifiedOn = DateTime.Now;
+                    user.ModifiedOn = DateTime.UtcNow;
                     user.ModifiedBy = updateBy;
                     try
                     {
@@ -95,7 +95,7 @@ namespace WebApiService.Services
             {
                 user.Password = password;
                 user.ModifiedBy = updateBy;
-                user.ModifiedOn = DateTime.Now;
+                user.ModifiedOn = DateTime.UtcNow;
                 try
                 {
                     _ctx.Users.Update(user);
@@ -116,7 +116,7 @@ namespace WebApiService.Services
             {
                 user.Login = login;
                 user.ModifiedBy = updateBy;
-                user.ModifiedOn = DateTime.Now;
+                user.ModifiedOn = DateTime.UtcNow;
                 try
                 {
                     _ctx.Users.Update(user);
@@ -132,7 +132,7 @@ namespace WebApiService.Services
 
         public async Task<ICollection<User>> GetActiveUsersAsync()
         {
-            return await _ctx.Users.Where(u => u.RevokedOn != null).OrderBy(u => u.CreatedOn).ToListAsync();
+            return await _ctx.Users.Where(u => !u.RevokedOn.HasValue).OrderBy(u => u.CreatedOn).ToListAsync();
         }
 
         public async Task<User?> GetUserAsync(string login)
@@ -174,7 +174,7 @@ namespace WebApiService.Services
             var user = await _GetUserAsync(login);
             if (user != null)
             {
-                user.RevokedOn = DateTime.Now;
+                user.RevokedOn = DateTime.UtcNow;
                 user.RevokedBy = deleteBy;
                 try
                 {
