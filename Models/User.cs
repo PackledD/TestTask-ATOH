@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models
 {
+    [Index(nameof(Login), IsUnique = true)]
     public class User
     {
         [Key]
