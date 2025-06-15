@@ -148,7 +148,8 @@ namespace WebApiService.Services
 
         public async Task<ICollection<User>> GetElderUsersAsync(int age)
         {
-            return await _ctx.Users.Where(u => u.Age() > age).ToListAsync();
+            //return await _ctx.Users.Where(u => u.Age() > age).ToListAsync();
+            return await _ctx.Users.Where(u => u.Birthday.HasValue && u.Birthday < DateTime.UtcNow.AddYears(-age)).ToListAsync();
         }
 
         public async Task<User?> DeleteUserHardAsync(string login)

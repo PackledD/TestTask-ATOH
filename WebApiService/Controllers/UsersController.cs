@@ -83,7 +83,7 @@ namespace WebApiService.Controllers
             {
                 return NotFound();
             }
-            return Ok();
+            return Ok(new { res.Name, res.Gender, res.Birthday, isActive = !res.RevokedOn.HasValue });
         }
 
         [HttpPost("{login}/auth")]
@@ -94,7 +94,7 @@ namespace WebApiService.Controllers
             {
                 return NotFound();
             }
-            return Ok();
+            return Ok(res);
         }
 
         [HttpGet("elder")]
