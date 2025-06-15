@@ -1,4 +1,6 @@
 
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
 using WebApiService.Services;
 
 namespace WebApiService
@@ -14,6 +16,11 @@ namespace WebApiService
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddScoped<UsersService>();
+            builder.Services.AddDbContext<UsersContext>(opt =>
+            {
+                var conn = builder.Configuration.GetConnectionString("Pg");
+                opt.UseNpgsql(conn);
+            });
 
             var app = builder.Build();
             if (app.Environment.IsDevelopment())
