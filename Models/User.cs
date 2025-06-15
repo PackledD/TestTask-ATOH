@@ -10,6 +10,8 @@ namespace Models
         public string Login { get; set; }
         [RegularExpression(@"^[a-zA-Z0-9]+$")]
         public string Password { get; set; }
+        [RegularExpression(@"^[ЁёА-яa-zA-Z]+$")]
+        public string Name { get; set; }
         public int Gender { get; set; }
         public DateTime? Birthday { get; set; }
         public bool Admin { get; set; }
