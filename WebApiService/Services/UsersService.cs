@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Models;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApiService.Services
 {
@@ -39,6 +40,7 @@ namespace WebApiService.Services
             {
                 newUser.CreatedOn = DateTime.UtcNow;
                 newUser.CreatedBy = createBy;
+                ValidateUser(newUser);
                 await _ctx.Users.AddAsync(newUser);
                 await _ctx.SaveChangesAsync();
                 return newUser;
@@ -76,6 +78,7 @@ namespace WebApiService.Services
                     user.ModifiedBy = updateBy;
                     try
                     {
+                        ValidateUser(user);
                         _ctx.Users.Update(user);
                         await _ctx.SaveChangesAsync();
                     }
@@ -98,6 +101,7 @@ namespace WebApiService.Services
                 user.ModifiedOn = DateTime.UtcNow;
                 try
                 {
+                    ValidateUser(user);
                     _ctx.Users.Update(user);
                     await _ctx.SaveChangesAsync();
                 }
@@ -119,6 +123,7 @@ namespace WebApiService.Services
                 user.ModifiedOn = DateTime.UtcNow;
                 try
                 {
+                    ValidateUser(user);
                     _ctx.Users.Update(user);
                     await _ctx.SaveChangesAsync();
                 }
@@ -208,6 +213,12 @@ namespace WebApiService.Services
                 }
             }
             return user;
+        }
+
+        private void ValidateUser(User user)
+        {
+            var ctx = new ValidationContext(user);
+            Validator.ValidateObject(user, ctx, true);
         }
     }
 }
