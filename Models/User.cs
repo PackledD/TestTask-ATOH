@@ -2,6 +2,7 @@
 
 namespace Models
 {
+    []
     public class User
     {
         [Key]
@@ -17,9 +18,9 @@ namespace Models
         public bool Admin { get; set; }
         public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
-        public DateTime ModifiedOn { get; set; }
-        public string ModifiedBy { get; set; }
-        public DateTime RevokedOn { get; set; }
-        public string RevokedBy { get; set; }
+        public DateTime? ModifiedOn { get; set; } = null;
+        public string? ModifiedBy { get; set; } = null;
+        public DateTime? RevokedOn { get; set; } = null;
+        public string? RevokedBy { get; set; } = null;
     }
 }
